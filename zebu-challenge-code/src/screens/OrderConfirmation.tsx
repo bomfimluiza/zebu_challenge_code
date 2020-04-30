@@ -5,13 +5,15 @@ import Routes from '../routes';
 import Order from '../models/Order';
 import { Box, Paper, Button, Typography } from '@material-ui/core';
 import Title from '../components/Title';
+import { updateInfo } from '../api/appData';
 
 interface Props {
   order: Order,
-  sendOrder: (order: Order) => void
+  previousOrders: any[],
+  resetStates: (reset: boolean) => void
 }
 
-export default function OrderConfirmation({order, sendOrder}: Props) {
+export default function OrderConfirmation({order, previousOrders, resetStates}: Props) {
   const history = useHistory();
   const useStyles = makeStyles(() => ({
     container: {
@@ -47,8 +49,12 @@ export default function OrderConfirmation({order, sendOrder}: Props) {
   const classes = useStyles();
 
   function finishOrder() {
-    sendOrder(order);
-    history.push(Routes.Home);
+    updateInfo([...previousOrders, order]).then(response => {
+      resetStates(true);
+      history.push(Routes.Home);
+    }, error => {
+      resetStates(false);
+    });
   }
 
   return (

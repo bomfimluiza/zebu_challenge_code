@@ -12,7 +12,7 @@ import OrderConfirmation from './screens/OrderConfirmation';
 import AppFrame from './components/AppFrame';
 import Ingredient from './models/Ingredient';
 import Snackbar from './components/Snackbar';
-import { getInfo, updateInfo } from './api/appData';
+import { getInfo } from './api/appData';
 import { Box } from '@material-ui/core';
 
 function App() {
@@ -75,16 +75,16 @@ function App() {
     setOrderState({order: {...order, ingredients, total: order.total + aditionalCost}});
   }
 
-  // Callback function to update the orders array, with the new order, on the server
-  // and reset the Ingredients and Order state
-  function sendOrder(order: Order) {
-    updateInfo([...previousOrdersState.orders, order]).then(response => {
+  // Callback function to reset the Ingredients and Order state
+  function resetStates(reset: boolean) {
+    if(reset) {
       handleAlertOpen('Order successfully sent!');
-    }, error => {
+      resetIngredientsQuantity();
+      resetOrder();
+    }
+    else {
       handleAlertOpen('Failed to send order.');
-    });
-    resetIngredientsQuantity();
-    resetOrder();
+    }
   }
 
   return (
@@ -119,7 +119,8 @@ function App() {
             <Route path={Routes.Confirmation}>
               <OrderConfirmation
                 order={orderState.order}
-                sendOrder={(order) => sendOrder(order)}
+                previousOrders={previousOrdersState.orders}
+                resetStates={(reset) => resetStates(reset)}
               />
             </Route>
             <Redirect to={Routes.Home}/>
