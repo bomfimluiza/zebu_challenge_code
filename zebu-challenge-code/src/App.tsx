@@ -16,7 +16,7 @@ import { getInfo } from './api/appData';
 import { Box } from '@material-ui/core';
 
 function App() {
-  // All states
+  // All States
   const [alertState, setAlertState] = useState({open: false, message: ''});
   const [sizesState, setSizesState] = useState({sizes: []});
   const [crustsState, setCrustsState] = useState({crusts: []});
@@ -36,7 +36,7 @@ function App() {
     })
   });
 
-  // Get pizza information from server when component did mount
+  // Get Pizza information from server when component did mount
   useEffect(() => {
     getInfo().then(data => {
       setSizesState({sizes: data.sizes});
@@ -53,7 +53,7 @@ function App() {
     })
   }, []);
 
-  //Callback functions to set order values
+  //Callback functions to set Order values
   function setOrderSize(size: Size) {
     const order = orderState.order;
     setOrderState({order: {...order, size, total: order.total + size.price}});
