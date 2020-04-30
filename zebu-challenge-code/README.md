@@ -1,3 +1,14 @@
+## Zebu Pizza
+
+This project is a code challenge for Zebu company.<br />
+The frontend was made in React + Typescript and there is a very simple backend made with firebase realtime database.
+
+To run the project open a terminal on the project repository and run:
+
+### `yarn start`
+
+--------------------------------------------------------------------------------------------
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
