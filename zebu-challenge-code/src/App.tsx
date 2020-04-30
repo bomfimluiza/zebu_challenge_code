@@ -16,22 +16,7 @@ import { getInfo, updateInfo } from './api/appData';
 import { Box } from '@material-ui/core';
 
 function App() {
-  useEffect(() => {
-    getInfo().then(data => {
-      setSizesState({sizes: data.sizes});
-      setCrustsState({crusts: data.crusts});
-      setIngredientsSettingsState({
-        baseIngredientsNumber: data.baseIngredientsNumber,
-        extraIngredientPrice: data.extraIngredientPrice
-      });
-      setIngredientsState({ingredients: data.ingredients});
-      setPreviousOrdersState({orders: data.orders});
-      setOrderState({order: {...orderState.order, id: data.orders.length.toString()}});
-    }, error => {
-      handleAlertOpen('Failed to load information.');
-    })
-  }, []);
-
+  // All states
   const [alertState, setAlertState] = useState({open: false, message: ''});
   const [sizesState, setSizesState] = useState({sizes: []});
   const [crustsState, setCrustsState] = useState({crusts: []});
@@ -51,6 +36,24 @@ function App() {
     })
   });
 
+  // Get pizza information from server when component did mount
+  useEffect(() => {
+    getInfo().then(data => {
+      setSizesState({sizes: data.sizes});
+      setCrustsState({crusts: data.crusts});
+      setIngredientsSettingsState({
+        baseIngredientsNumber: data.baseIngredientsNumber,
+        extraIngredientPrice: data.extraIngredientPrice
+      });
+      setIngredientsState({ingredients: data.ingredients});
+      setPreviousOrdersState({orders: data.orders});
+      setOrderState({order: {...orderState.order, id: data.orders.length.toString()}});
+    }, error => {
+      handleAlertOpen('Failed to load information.');
+    })
+  }, []);
+
+  //Callback functions to set order values
   function setOrderSize(size: Size) {
     const order = orderState.order;
     setOrderState({order: {...order, size, total: order.total + size.price}});
@@ -72,40 +75,17 @@ function App() {
     setOrderState({order: {...order, ingredients, total: order.total + aditionalCost}});
   }
 
-  function cleanIngredientsQuantity() {
-    let ingredients = ingredientsState.ingredients;
-    ingredients.forEach((ingredient: Ingredient) => ingredient.quantity = 0);
-    setIngredientsState({ingredients});
-  }
-
-  function cleanOrder() {
-    setOrderState({order: {
-      id: '',
-      size: {id: '', name: '', price: 0, maxToppings: 0},
-      crust: {id: '', name: '', price: 0, imageSrc: ''},
-      ingredients: [],
-      total: 0
-    }});
-  }
-
+  // Callback function to update the orders array, with the new order, on the server
+  // and reset the Ingredients and Order state
   function sendOrder(order: Order) {
     updateInfo([...previousOrdersState.orders, order]).then(response => {
       handleAlertOpen('Order successfully sent!');
     }, error => {
       handleAlertOpen('Failed to send order.');
     });
-    cleanIngredientsQuantity();
-    cleanOrder();
+    resetIngredientsQuantity();
+    resetOrder();
   }
-
-  function handleAlertOpen(message: string) {
-    setAlertState({open: true, message});
-  };
-
-  function handleAlertClose(event?: React.SyntheticEvent, reason?: string) {
-    if (reason === 'clickaway') return;
-    setAlertState({...alertState, open: false});
-  };
 
   return (
     <Box>
@@ -149,6 +129,32 @@ function App() {
       </AppFrame>
     </Box>
   );
+
+  // Utils
+  function resetIngredientsQuantity() {
+    let ingredients = ingredientsState.ingredients;
+    ingredients.forEach((ingredient: Ingredient) => ingredient.quantity = 0);
+    setIngredientsState({ingredients});
+  }
+
+  function resetOrder() {
+    setOrderState({order: {
+      id: '',
+      size: {id: '', name: '', price: 0, maxToppings: 0},
+      crust: {id: '', name: '', price: 0, imageSrc: ''},
+      ingredients: [],
+      total: 0
+    }});
+  }
+
+  function handleAlertOpen(message: string) {
+    setAlertState({open: true, message});
+  };
+
+  function handleAlertClose(event?: React.SyntheticEvent, reason?: string) {
+    if (reason === 'clickaway') return;
+    setAlertState({...alertState, open: false});
+  };
 }
 
 export default App;
